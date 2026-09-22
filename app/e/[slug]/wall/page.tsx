@@ -1,12 +1,12 @@
 import { getTranslations } from "next-intl/server";
 import { WallClient } from "@/components/guest/WallClient";
-import { getPublicEvent, getWallItems } from "@/lib/events";
+import { getGuestLocale, getPublicEvent, getWallItems } from "@/lib/events";
 import Link from "next/link";
 
 export default async function WallPage({ params }: PageProps<"/e/[slug]/wall">) {
   const { slug } = await params;
   const event = await getPublicEvent(slug);
-  const locale = event?.language ?? "de";
+  const locale = await getGuestLocale(event);
   const t = await getTranslations({ locale, namespace: "wall" });
   if (!event) return <main className="flex min-h-screen items-center justify-center p-6 text-center"><p>{t("empty")}</p></main>;
   const initialItems = await getWallItems(slug);

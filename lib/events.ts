@@ -21,6 +21,12 @@ export type EventRecord = {
   created_at: string;
 };
 
+export async function getGuestLocale(event: Pick<EventRecord, "language"> | null) {
+  const override = (await cookies()).get("oan_locale")?.value;
+  if (override === "de" || override === "tr") return override;
+  return event?.language ?? "de";
+}
+
 export async function getPublicEvent(slug: string) {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     if (slug !== "demo") return null;
