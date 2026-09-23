@@ -86,8 +86,15 @@ export function WallClient({ slug, eventId, locale, initialItems }: { slug: stri
 
   async function toggleLike(itemId: string) {
     const visitorId = getVisitorId();
+    const wasLiked = likes[itemId] === true;
+    setLikes((current) => ({ ...current, [itemId]: !wasLiked }));
+    setItems((current) => current.map((item) => item.id === itemId ? { ...item, like_count: Math.max(0, (item.like_count ?? 0) + (wasLiked ? -1 : 1)) } : item));
     const response = await fetch(`/api/events/${slug}/photos/${itemId}/react`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "like", visitorId }) });
-    if (!response.ok) return;
+    if (!response.ok) {
+      setLikes((current) => ({ ...current, [itemId]: wasLiked }));
+      setItems((current) => current.map((item) => item.id === itemId ? { ...item, like_count: Math.max(0, (item.like_count ?? 0) + (wasLiked ? 1 : -1)) } : item));
+      return;
+    }
     const result = await response.json() as { liked: boolean; likeCount: number };
     setLikes((current) => ({ ...current, [itemId]: result.liked }));
     setItems((current) => current.map((item) => item.id === itemId ? { ...item, like_count: result.likeCount } : item));
