@@ -30,7 +30,7 @@ export async function getGuestLocale(event: Pick<EventRecord, "language"> | null
 export async function getPublicEvent(slug: string) {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     if (slug !== "demo") return null;
-    return { id: "demo", owner_id: null, slug: "demo", title: "Mira & Deniz", language: "de", event_date: "2026-09-26", theme: { primaryColor: "#c96f5c", backgroundColor: "#f8f3ec" }, plan: "free", expires_at: new Date(Date.now() + 86400000).toISOString(), created_at: new Date().toISOString() } as EventRecord;
+    return { id: "demo", owner_id: null, slug: "demo", title: "Yeşim & Emrah", language: "de", event_date: "2026-09-26", theme: { primaryColor: "#c96f5c", backgroundColor: "#f8f3ec" }, plan: "free", expires_at: new Date(Date.now() + 86400000).toISOString(), created_at: new Date().toISOString() } as EventRecord;
   }
   const supabase = await createClient();
   const { data } = await supabase

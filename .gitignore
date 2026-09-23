@@ -39,6 +39,9 @@ yarn-error.log*
 # supabase
 supabase/.temp/
 
+# unprocessed source photos dropped in the project root
+/wedding_foto.jpg
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
