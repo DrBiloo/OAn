@@ -6,11 +6,33 @@ enabled = true
 [db]
 port = 54322
 
+[db.pooler]
+default_pool_size = 15
+max_client_conn = 200
+
 [studio]
 port = 54323
 
 [storage]
 enabled = true
 
+[storage.analytics]
+enabled = true
+max_namespaces = 10
+
+[storage.image_transformation]
+enabled = true
+
 [auth]
 enabled = true
+additional_redirect_urls = ["http://localhost:3000/**", "https://o-an.vercel.app/**"]
+site_url = "https://o-an.vercel.app"
+
+[auth.email]
+enable_confirmations = true
+max_frequency = "1m0s"
+otp_length = 8
+
+[auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true
