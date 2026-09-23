@@ -17,7 +17,8 @@ async function sendMagicLink(formData: FormData) {
   const confirmUrl = new URL(`${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/auth/confirm`);
   confirmUrl.searchParams.set("next", nextPath);
   const supabase = await createClient();
-  await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: confirmUrl.toString() } });
+  const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: confirmUrl.toString() } });
+  if (error) redirect(`/${locale}/login?error=${error.status === 429 ? "rate_limited" : "send_failed"}`);
   redirect(`/${locale}/login?sent=1`);
 }
 
@@ -33,6 +34,8 @@ export default async function LoginPage({ params, searchParams }: PageProps<"/[l
       <h1 className="mt-4 text-5xl leading-none tracking-tight md:text-7xl">{t("title")}</h1>
       <p className="mx-auto mt-5 max-w-md text-lg leading-relaxed text-[var(--muted)]">{t("body")}</p>
       {query.sent && <p className="mt-5 font-sans text-sm text-[var(--coral)]">{t("sent")}</p>}
+      {query.error === "rate_limited" && <p className="mt-5 font-sans text-sm text-[var(--coral)]">{t("errorRateLimited")}</p>}
+      {query.error === "send_failed" && <p className="mt-5 font-sans text-sm text-[var(--coral)]">{t("errorSendFailed")}</p>}
       <form action={sendMagicLink} className="mx-auto mt-10 max-w-sm space-y-5 text-left">
         <input type="hidden" name="locale" value={locale} />
         <label className="block font-sans text-sm">{t("namesLabel")}<input name="names" placeholder={t("namesPlaceholder")} className="mt-2 w-full border-b border-[var(--line)] bg-transparent py-3 outline-none" /></label>
