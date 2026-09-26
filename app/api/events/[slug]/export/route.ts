@@ -18,7 +18,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ slu
   const { password } = await request.json().catch(() => ({ password: "" }));
   if (typeof password !== "string" || !timingSafeEqual(digest(password), digest(expected))) return NextResponse.json({ error: "wrong_password" }, { status: 401 });
 
-  const { data: event } = await createAdminClient().from("events").select("id, slug, title").eq("slug", slug).maybeSingle();
+  const { data: event } = await createAdminClient().from("events").select("id, slug, title, event_date, language").eq("slug", slug).maybeSingle();
   if (!event) return NextResponse.json({ error: "not_found" }, { status: 404 });
 
   return exportEventZip(event);

@@ -1,8 +1,10 @@
 import JSZip from "jszip";
 import { NextResponse } from "next/server";
+import { getTranslations } from "next-intl/server";
+import { createGuestbookPdf } from "./guestbook-pdf";
 import { createAdminClient } from "./supabase/admin";
 
-export async function exportEventZip(event: { id: string; slug: string; title: string }) {
+export async function exportEventZip(event: { id: string; slug: string; title: string; event_date: string | null; language: string }) {
   const admin = createAdminClient();
   const [{ data: photos }, { data: messages }] = await Promise.all([
     admin.from("photos").select("id, storage_path, guest_name, created_at").eq("event_id", event.id).eq("hidden", false).order("created_at", { ascending: true }),
@@ -11,6 +13,8 @@ export async function exportEventZip(event: { id: string; slug: string; title: s
 
   const archive = new JSZip();
   archive.file("messages.json", JSON.stringify({ event, messages: messages ?? [] }, null, 2));
+  const t = await getTranslations({ locale: event.language, namespace: "export" });
+  archive.file(t("guestbookFile"), await createGuestbookPdf(event, messages ?? [], event.language, { title: t("guestbookTitle"), guest: t("guest"), empty: t("empty"), page: t("page") }));
   for (const [index, photo] of (photos ?? []).entries()) {
     const { data, error } = await admin.storage.from("event-photos").download(photo.storage_path);
     if (error || !data) continue;

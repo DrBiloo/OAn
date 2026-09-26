@@ -10,7 +10,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
-  const { data: event } = await supabase.from("events").select("id, slug, title").eq("id", id).eq("owner_id", user.id).maybeSingle();
+  const { data: event } = await supabase.from("events").select("id, slug, title, event_date, language").eq("id", id).eq("owner_id", user.id).maybeSingle();
   if (!event) return NextResponse.json({ error: "not_found" }, { status: 404 });
 
   return exportEventZip(event);
