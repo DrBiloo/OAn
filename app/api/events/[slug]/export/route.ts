@@ -1,6 +1,6 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
-import { exportEventZip } from "@/lib/export";
+import { exportEventZip, exportGuestbookPdf } from "@/lib/export";
 import { allowRequest, clientIp } from "@/lib/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -15,11 +15,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ slu
   if (slug !== "demo" || !expected) return NextResponse.json({ error: "not_found" }, { status: 404 });
   if (!allowRequest(`demo-export:${clientIp(request)}`, 5, 15 * 60 * 1000)) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
 
-  const { password } = await request.json().catch(() => ({ password: "" }));
+  const { password, kind } = await request.json().catch(() => ({ password: "" }));
   if (typeof password !== "string" || !timingSafeEqual(digest(password), digest(expected))) return NextResponse.json({ error: "wrong_password" }, { status: 401 });
 
   const { data: event } = await createAdminClient().from("events").select("id, slug, title, event_date, language").eq("slug", slug).maybeSingle();
   if (!event) return NextResponse.json({ error: "not_found" }, { status: 404 });
 
-  return exportEventZip(event);
+  return kind === "guestbook" ? exportGuestbookPdf(event) : exportEventZip(event, { photosOnly: true });
 }
