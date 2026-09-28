@@ -13,7 +13,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ slu
   const { slug } = await params;
   const expected = process.env.DEMO_EXPORT_PASSWORD;
   if (slug !== "demo" || !expected) return NextResponse.json({ error: "not_found" }, { status: 404 });
-  if (!allowRequest(`demo-export:${clientIp(request)}`, 5, 15 * 60 * 1000)) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+  if (!(await allowRequest(`demo-export:${clientIp(request)}`, 5, 15 * 60))) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
 
   const { password, kind } = await request.json().catch(() => ({ password: "" }));
   if (typeof password !== "string" || !timingSafeEqual(digest(password), digest(expected))) return NextResponse.json({ error: "wrong_password" }, { status: 401 });

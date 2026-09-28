@@ -4,7 +4,7 @@ import { allowRequest, clientIp } from "@/lib/rate-limit";
 
 export async function POST(request: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  if (!allowRequest(`message:${slug}:${clientIp(request)}`, 8)) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+  if (!(await allowRequest(`message:${slug}:${clientIp(request)}`, 8))) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   const body = await request.json() as { text?: string; guestName?: string; visitorId?: string; fontStyle?: string };
   const text = body.text?.trim().slice(0, 500);
   if (!text) return NextResponse.json({ error: "Message required" }, { status: 400 });

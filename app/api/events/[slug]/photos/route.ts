@@ -4,7 +4,7 @@ import { allowRequest, clientIp } from "@/lib/rate-limit";
 
 export async function POST(request: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  if (!allowRequest(`photo:${slug}:${clientIp(request)}`, 12)) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+  if (!(await allowRequest(`photo:${slug}:${clientIp(request)}`, 12))) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   const body = await request.json() as { storagePath?: string; thumbPath?: string; guestName?: string; visitorId?: string };
   const admin = createAdminClient();
   const { data: event } = await admin.from("events").select("id").eq("slug", slug).gt("expires_at", new Date().toISOString()).maybeSingle();

@@ -5,7 +5,7 @@ import { allowRequest, clientIp } from "@/lib/rate-limit";
 export async function POST(request: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const body = await request.json() as { filename?: string; contentType?: string };
-  if (!allowRequest(`upload:${slug}:${clientIp(request)}`, 12)) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+  if (!(await allowRequest(`upload:${slug}:${clientIp(request)}`, 12))) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   const allowedTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"]);
   if (!body.filename || !body.contentType || !allowedTypes.has(body.contentType)) return NextResponse.json({ error: "invalid_image" }, { status: 400 });
   const admin = createAdminClient();
