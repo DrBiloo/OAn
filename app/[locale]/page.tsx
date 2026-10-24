@@ -12,7 +12,7 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
       <p className="eyebrow">{t("eyebrow")}</p>
       <h1 className="mt-4 text-5xl leading-none tracking-tight md:text-7xl">{t("title")}</h1>
       <p className="mx-auto mt-5 max-w-md text-lg leading-relaxed text-[var(--muted)]">{t("body")}</p>
-      <nav className="mx-auto mt-10 grid max-w-sm gap-3"><Link href={`/${locale}/login`} className="soft-button soft-button-sage py-4 text-sm">{t("host")}</Link><Link href="/e/demo" className="soft-button soft-button-outline py-4 text-sm">{t("guest")}</Link></nav>
+      <nav className="mx-auto mt-10 grid max-w-sm gap-3"><button type="button" disabled aria-disabled="true" className="soft-button soft-button-sage cursor-not-allowed py-4 text-sm opacity-50">{t("host")}</button><Link href="/e/demo" className="soft-button soft-button-outline py-4 text-sm">{t("guest")}</Link></nav>
     </section>
   </main>;
 }
