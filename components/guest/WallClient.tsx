@@ -58,6 +58,7 @@ export function WallClient({ slug, eventId, locale, initialItems }: { slug: stri
   const [fileName, setFileName] = useState("");
   const viewed = useRef(new Set<string>());
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const refresh = useCallback(() => {
     fetch(`/api/events/${slug}/wall`, { cache: "no-store" }).then((response) => response.ok ? response.json() as Promise<WallItem[]> : null).then((data) => { if (data) setItems(data); });
@@ -128,6 +129,7 @@ export function WallClient({ slug, eventId, locale, initialItems }: { slug: stri
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
+      if (cameraInputRef.current) cameraInputRef.current.value = "";
       setFileName("");
     }
   }
@@ -143,10 +145,12 @@ export function WallClient({ slug, eventId, locale, initialItems }: { slug: stri
       <div className="mb-8 rounded-[1.75rem] border border-dashed border-[var(--coral)]/40 bg-white/60 p-5">
         <p className="mb-3 font-sans text-sm font-semibold text-[var(--ink)]">{t("uploadTitle")}</p>
         <input value={guestName} onChange={(event) => setGuestName(event.target.value)} placeholder={t("guest")} disabled={uploading} className="mb-3 w-full border-b border-[var(--line)] bg-transparent px-0 py-2 font-sans text-sm outline-none disabled:opacity-50" />
-        <div className="flex items-center gap-3">
-          <label htmlFor="wall-photo-input" className={`soft-button shrink-0 bg-[var(--coral)] py-2.5 text-white ${uploading ? "pointer-events-none opacity-50" : ""}`}>{t("chooseFile")}</label>
-          <input id="wall-photo-input" ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" capture="environment" disabled={uploading} onChange={(event) => void handleFileSelected(event.target.files?.[0])} className="hidden" />
-          <span className="truncate font-sans text-xs text-[var(--muted)]">{fileName || t("noFileChosen")}</span>
+        <div className="flex flex-wrap items-center gap-3">
+          <label htmlFor="wall-photo-camera" className={`soft-button shrink-0 bg-[var(--coral)] py-2.5 text-white ${uploading ? "pointer-events-none opacity-50" : ""}`}>{t("takePhoto")}</label>
+          <input id="wall-photo-camera" ref={cameraInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" capture="environment" disabled={uploading} onChange={(event) => void handleFileSelected(event.target.files?.[0])} className="hidden" />
+          <label htmlFor="wall-photo-input" className={`soft-button soft-button-outline shrink-0 py-2.5 ${uploading ? "pointer-events-none opacity-50" : ""}`}>{t("chooseFile")}</label>
+          <input id="wall-photo-input" ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" disabled={uploading} onChange={(event) => void handleFileSelected(event.target.files?.[0])} className="hidden" />
+          <span className="min-w-0 basis-full truncate font-sans text-xs text-[var(--muted)]">{fileName || t("noFileChosen")}</span>
         </div>
         {uploading && <p className="mt-3 font-sans text-xs text-[var(--coral)]">{t("uploading")}</p>}
         {uploadError && <p className="mt-3 font-sans text-xs text-[var(--coral)]">{uploadError}</p>}
